@@ -4,6 +4,20 @@ from pygame import image
 from pygame.sprite import DirtySprite
 from pygame import mouse
 
+class Bullet(DirtySprite):
+
+    def __init__(self, scene):
+        super().__init__(scene.groups["bullets"])
+        b_image = image.load(path.join(path.dirname(__file__), "img/genericItem_color_031.png"))
+        self.image = b_image
+        self.rect = self.image.get_rect()
+        self.rect.bottom = 600
+        self.scene = scene
+
+    def update(self, time_delta):
+        self.rect.centery += -10
+        self.dirty = True
+
 class Player(DirtySprite):
 
     def __init__(self, scene):
@@ -30,6 +44,7 @@ class Game(BaseScene):
     def __init__(self, engine, background_color=(90, 55, 100), **kwargs):
         super().__init__(engine=engine, background_color=background_color, **kwargs)
         Player(self)
+        Bullet(self)
 
 def main():
     with GameEngine(Game, resolution=(400, 600)) as engine:
