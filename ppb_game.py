@@ -18,12 +18,6 @@ class Bullet(DirtySprite):
     #    self.rect.centery += -10
     #    self.dirty = True
 
-
-
-
-
-
-
 class Player(DirtySprite):
 
     def __init__(self, scene):
@@ -53,12 +47,28 @@ class Player(DirtySprite):
             self.bullet_delay = 0
         self.bullet_delay += time_delta
 
+class Enemy(DirtySprite):
+
+    def __init__(self, scene, x_position):
+        super().__init__(scene.groups["enemy"])
+        p_image = image.load(path.join(path.dirname(__file__), "img/adventurer_fall.png"))
+        self.image = p_image
+        self.rect = self.image.get_rect()
+        self.rect.bottom = 0
+        self.rect.centerx = x_position
+        self.scene = scene
+
+    def update(self, time_delta):
+        self.rect.centery += 3
+        self.dirty = True
+
 class Game(BaseScene):
 
     def __init__(self, engine, background_color=(90, 55, 100), **kwargs):
         super().__init__(engine=engine, background_color=background_color, **kwargs)
         Player(self)
         Bullet(self, (0, 0)).kill()
+        Enemy(self, 200)
 
 def main():
     with GameEngine(Game, resolution=(400, 600)) as engine:
