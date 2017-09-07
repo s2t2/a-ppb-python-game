@@ -114,15 +114,17 @@ class Game(BaseScene):
 
     #def simulate(self, time_delta):
     #    super().simulate(time_delta)
-    #    player = self.groups["player"]
-    #    bullets = self.groups["bullets"]
-    #    enemies = self.groups["enemy"]
-    #    groupcollide(player, enemies, True, True)
-    #    groupcollide(enemies, bullets, True, True)
+    #    self.spawner.spawn(time_delta)
 
     def simulate(self, time_delta):
         super().simulate(time_delta)
+        player = self.groups["player"]
+        bullets = self.groups["bullets"]
+        enemies = self.groups["enemy"]
+        groupcollide(player, enemies, True, True)
+        groupcollide(enemies, bullets, True, True)
         self.spawner.spawn(time_delta)
+
 
 def main():
     with GameEngine(Game, resolution=(400, 600)) as engine:
