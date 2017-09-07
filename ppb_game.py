@@ -4,6 +4,21 @@ from pygame import image
 from pygame.sprite import DirtySprite
 from pygame import mouse
 from pygame.sprite import groupcollide
+from itertools import count
+import csv
+
+def simple_infinite_spawn(time_step, x_val):
+    for value in count(1):
+        time = time_step * value
+        yield time, x_val
+
+def file_spawner(file_name):
+    with open(path.join(path.dirname(__file__), file_name), "r") as spawn_file:
+        spawn_reader = csv.reader(spawn_file)
+        for row in spawn_reader:
+            yield float(row[0]), int(row[1])
+
+
 
 class Bullet(DirtySprite):
 
@@ -63,21 +78,52 @@ class Enemy(DirtySprite):
         self.rect.centery += 3
         self.dirty = True
 
+class Spawner(object):
+
+    def __init__(self, scene, generator, enemy_class):
+        self.scene = scene
+        self.enemy_class = enemy_class
+        self.generator = generator
+        self.running = True
+        self.time = 0
+        self.next_time = None
+        self.next_position = None
+        self.prime()
+
+    def spawn(self, time_delta):
+        self.time += time_delta
+        while self.running and self.time >= self.next_time:
+            self.enemy_class(self.scene, self.next_position)
+            self.prime()
+
+    def prime(self):
+        try:
+            self.next_spawn, self.next_position = next(self.generator)
+        except StopIteration:
+            self.running = False
+
+
 class Game(BaseScene):
 
     def __init__(self, engine, background_color=(90, 55, 100), **kwargs):
         super().__init__(engine=engine, background_color=background_color, **kwargs)
         Player(self)
         Bullet(self, (0, 0)).kill()
-        Enemy(self, 200)
+        #Enemy(self, 200)
+        #self.spawner = Spawner(self, simple_infinite_spawn(1.5, 200), Enemy)
+        self.spawner = Spawner(self, file_spawner('spawn.csv'), Enemy)
+
+    #def simulate(self, time_delta):
+    #    super().simulate(time_delta)
+    #    player = self.groups["player"]
+    #    bullets = self.groups["bullets"]
+    #    enemies = self.groups["enemy"]
+    #    groupcollide(player, enemies, True, True)
+    #    groupcollide(enemies, bullets, True, True)
 
     def simulate(self, time_delta):
         super().simulate(time_delta)
-        player = self.groups["player"]
-        bullets = self.groups["bullets"]
-        enemies = self.groups["enemy"]
-        groupcollide(player, enemies, True, True)
-        groupcollide(enemies, bullets, True, True)
+        self.spawner.spawn(time_delta)
 
 def main():
     with GameEngine(Game, resolution=(400, 600)) as engine:
