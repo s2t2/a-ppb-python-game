@@ -2,6 +2,7 @@ from os import path
 from ppb import GameEngine, BaseScene
 from pygame import image
 from pygame.sprite import DirtySprite
+from pygame import mouse
 
 class Player(DirtySprite):
 
@@ -10,6 +11,10 @@ class Player(DirtySprite):
         self.image = image.load(path.join(path.dirname(__file__), "img/zombie_hold1.png"))
         self.rect = self.image.get_rect()
         self.scene = scene
+
+    def update(self, time_delta):
+        self.rect.center = mouse.get_pos()
+        self.dirty = True
 
 class Game(BaseScene):
 
