@@ -30,9 +30,9 @@ class Bullet(DirtySprite):
         self.rect.midbottom = position  # Modify this
         self.scene = scene
 
-    #def update(self, time_delta):
-    #    self.rect.centery += -10
-    #    self.dirty = True
+    def update(self, time_delta):
+        self.rect.centery += -10
+        self.dirty = True
 
 class Player(DirtySprite):
 
@@ -79,15 +79,14 @@ class Enemy(DirtySprite):
         self.dirty = True
 
 class Spawner(object):
-
     def __init__(self, scene, generator, enemy_class):
         self.scene = scene
         self.enemy_class = enemy_class
         self.generator = generator
-        self.running = True
         self.time = 0
         self.next_time = None
         self.next_position = None
+        self.running = True
         self.prime()
 
     def spawn(self, time_delta):
@@ -98,7 +97,7 @@ class Spawner(object):
 
     def prime(self):
         try:
-            self.next_spawn, self.next_position = next(self.generator)
+            self.next_time, self.next_position = next(self.generator)
         except StopIteration:
             self.running = False
 
