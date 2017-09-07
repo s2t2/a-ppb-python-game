@@ -3,6 +3,7 @@ from ppb import GameEngine, BaseScene
 from pygame import image
 from pygame.sprite import DirtySprite
 from pygame import mouse
+from pygame.sprite import groupcollide
 
 class Bullet(DirtySprite):
 
@@ -69,6 +70,14 @@ class Game(BaseScene):
         Player(self)
         Bullet(self, (0, 0)).kill()
         Enemy(self, 200)
+
+    def simulate(self, time_delta):
+        super().simulate(time_delta)
+        player = self.groups["player"]
+        bullets = self.groups["bullets"]
+        enemies = self.groups["enemy"]
+        groupcollide(player, enemies, True, True)
+        groupcollide(enemies, bullets, True, True)
 
 def main():
     with GameEngine(Game, resolution=(400, 600)) as engine:
